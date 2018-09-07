@@ -582,7 +582,13 @@
     }
   },
   "deployments": {
-    "header": "Deployments"
+    "title": "Deployments",
+    "flyouts":
+    {
+      "new": {
+        "contextMenuName": "New deployment"
+      }
+    }
   },
   "walkthrough": {
     "tabs": {

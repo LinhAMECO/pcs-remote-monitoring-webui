@@ -3,7 +3,25 @@
 import { translate } from 'react-i18next';
 
 import { Deployments } from './deployments';
+import {
+  getCreateDeploymentError,
+  getCreateDeploymentPendingStatus,
+  getDeployments,
+  getDeploymentsLastUpdated,
+  epics as deploymentsEpics
+} from 'store/reducers/deploymentsReducer';
 
-// TODO
+// Pass the global info needed
+const mapStateToProps = state => ({
+  isPending: getCreateDeploymentPendingStatus(state),
+  error: getCreateDeploymentError(state),
+  deployments: getDeployments(state),
+  lastUpdated: getDeploymentsLastUpdated(state)
+});
 
-export const DeploymentsContainer = translate()(Deployments);
+// Wrap the dispatch methods
+const mapDispatchToProps = dispatch => ({
+  fetchDeployments: () => dispatch(deploymentsEpics.actions.fetchdeployments())
+});
+
+export const DeploymentsContainer = translate()(connect(mapStateToProps, mapDispatchToProps)(Deployments));
