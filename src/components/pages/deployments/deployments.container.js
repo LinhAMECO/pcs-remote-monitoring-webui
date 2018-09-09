@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import { translate } from 'react-i18next';
-
+import { connect } from 'react-redux';
 import { Deployments } from './deployments';
 import {
   getCreateDeploymentError,

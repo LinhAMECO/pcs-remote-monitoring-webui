@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 
-import { PageContent } from 'components/shared';
 import { permissions } from 'services/models';
 import {
   AjaxError,
@@ -10,10 +9,14 @@ import {
   ContextMenu,
   PageContent,
   Protected,
-  RefreshBar
+  RefreshBar,
+  PageTitle
 } from 'components/shared';
+import { DeviceGroupDropdownContainer as DeviceGroupDropdown } from 'components/shell/deviceGroupDropdown';
+import { ManageDeviceGroupsBtnContainer as ManageDeviceGroupsBtn } from 'components/shell/manageDeviceGroupsBtn';
 import { DeploymentsGrid } from './deploymentsGrid';
 import { DeploymentNewContainer } from './flyouts';
+import { svgs } from 'utilities';
 
 import './deployments.css';
 
@@ -50,7 +53,7 @@ export class Deployments extends Component {
     openFlyoutName: 'newDeployment'
   });
 
-  onGridReady = gridReadyEvent => this.packageGridApi = gridReadyEvent.api;
+  onGridReady = gridReadyEvent => this.deploymentGridApi = gridReadyEvent.api;
 
   render() {
     const { t, deployments, error, isPending, fetchDeployments, lastUpdated } = this.props;
