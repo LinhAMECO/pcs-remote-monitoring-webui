@@ -6,7 +6,7 @@ import moment from 'moment';
 import { schema, normalize } from 'normalizr';
 import update from 'immutability-helper';
 import { createSelector } from 'reselect';
-import { ConfigService } from 'services';
+import { IoTHubManagerService } from 'services';
 import {
   createReducerScenario,
   createEpicScenario,
@@ -24,27 +24,27 @@ const handleError = fromAction => error =>
   Observable.of(redux.actions.registerError(fromAction.type, { error, fromAction }));
 
 export const epics = createEpicScenario({
-  /** Loads Deployments*/
+  /** Loads Deployments */
   fetchDeployments: {
-    type: 'PACKAGES_FETCH',
+    type: 'DEPLOYMENTS_FETCH',
     epic: fromAction =>
-      ConfigService.getDeployments()
+      IoTHubManagerService.getDeployments()
         .map(toActionCreator(redux.actions.updateDeployments, fromAction))
         .catch(handleError(fromAction))
   },
   /** Create a new deployment */
   createDeployment: {
-    type: 'PACKAGES_CREATE',
+    type: 'DEPLOYMENTS_CREATE',
     epic: fromAction =>
-      ConfigService.createDeployment(fromAction.payload)
+      IoTHubManagerService.createDeployment(fromAction.payload)
         .map(toActionCreator(redux.actions.insertDeployment, fromAction))
         .catch(handleError(fromAction))
   },
   /** Delete deployment */
   deleteDeployment: {
-    type: 'PACKAGES_DELETE',
+    type: 'DEPLOYMENTS_DELETE',
     epic: fromAction =>
-      ConfigService.deleteDeployment(fromAction.payload)
+      IoTHubManagerService.deleteDeployment(fromAction.payload)
         .map(toActionCreator(redux.actions.deleteDeployment, fromAction))
         .catch(handleError(fromAction))
   }
@@ -102,10 +102,10 @@ const fetchableTypes = [
 ];
 
 export const redux = createReducerScenario({
-  insertDeployment: { type: 'PACKAGE_INSERT', reducer: insertDeploymentReducer },
-  deleteDeployment: { type: 'PACKAGES_DELETE', reducer: deleteDeploymentReducer },
-  updateDeployments: { type: 'PACKAGES_UPDATE', reducer: updateDeploymentsReducer },
-  registerError: { type: 'PACKAGES_REDUCER_ERROR', reducer: errorReducer },
+  insertDeployment: { type: 'DEPLOYMENT_INSERT', reducer: insertDeploymentReducer },
+  deleteDeployment: { type: 'DEPLOYMENTS_DELETE', reducer: deleteDeploymentReducer },
+  updateDeployments: { type: 'DEPLOYMENTS_UPDATE', reducer: updateDeploymentsReducer },
+  registerError: { type: 'DEPLOYMENTS_REDUCER_ERROR', reducer: errorReducer },
   isFetching: { multiType: fetchableTypes, reducer: pendingReducer }
 });
 

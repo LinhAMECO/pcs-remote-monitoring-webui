@@ -11,7 +11,8 @@ import {
   toJobsModel,
   toJobStatusModel,
   toDevicePropertiesModel,
-  toDeploymentsModel
+  toDeploymentsModel,
+  toDeploymentRequestModel
 } from './models';
 
 const ENDPOINT = Config.serviceUrls.iotHubManager;
@@ -68,7 +69,19 @@ export class IoTHubManagerService {
 
   /** Returns deployments */
   static getDeployments() {
-    return HttpClient.get(`${ENDPOINT}deviceproperties`)
+    return HttpClient.get(`${ENDPOINT}deployments`)
       .map(toDeploymentsModel);
+  }
+
+  /** Create a deployment */
+  static createDeployment(deploymentModel) {
+    return HttpClient.post(`${ENDPOINT}deployments`, deploymentModel)
+      .map(toDeploymentRequestModel);
+  }
+
+  /** Delete a deployment */
+  static deleteDeployment(id) {
+    return HttpClient.delete(`${ENDPOINT}deployments${id}`)
+      .map(() => id);
   }
 }
