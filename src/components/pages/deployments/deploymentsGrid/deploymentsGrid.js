@@ -15,9 +15,8 @@ export class DeploymentsGrid extends Component {
       deploymentsColumnDefs.priority,
       deploymentsColumnDefs.type,
       deploymentsColumnDefs.applied,
-      deploymentsColumnDefs.failed,
       deploymentsColumnDefs.succeeded,
-      deploymentsColumnDefs.targeted,
+      deploymentsColumnDefs.failed,
       deploymentsColumnDefs.dateCreated,
     ];
   }

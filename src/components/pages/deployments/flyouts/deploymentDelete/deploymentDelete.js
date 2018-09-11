@@ -7,7 +7,7 @@ import {
   Modal
 } from 'components/shared';
 
-import './packageDelete.css';
+import './deploymentDelete.css';
 
 export class DeploymentDelete extends LinkedComponent {
 

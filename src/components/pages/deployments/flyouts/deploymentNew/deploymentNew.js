@@ -26,41 +26,68 @@ import {
 
 import './deploymentNew.css';
 
+const packageOptions = (packages) => {
+  packages.map(({ id, name }) => ({
+    label: id,
+    value: name
+  }))
+}
+
 export class DeploymentNew extends LinkedComponent {
   constructor(props) {
     super(props);
 
     this.state = {
       packageType: undefined,
-      deploymentFile: undefined,
-      changesApplied: undefined
+      deviceGroupId: undefined,
+      name: undefined,
+      priority: undefined,
+      packageId: undefined,
+      changesApplied: undefined,
+      packageOptions: undefined
     };
   }
 
   apply = (event) => {
     event.preventDefault();
     const { createDeployment } = this.props;
-    const { packageType, deploymentFile } = this.state;
+    const { packageType, deviceGroupId, name, priority, packageId } = this.state;
     if (this.formIsValid()) {
-      createDeployment({ packageType: packageType, deploymentFile: deploymentFile });
+      createDeployment({ packageType, deviceGroupId, name, priority, packageId });
       this.setState({ changesApplied: true });
     }
-  }
-
-  onFileSelected = (e) => {
-    let file = e.target.files[0];
-    this.setState({ deploymentFile: file });
   }
 
   formIsValid = () => {
     return [
       this.packageTypeLink,
+      this.nameLink,
+      this.deviceGroupIdTypeLink,
+      this.priorityLink,
+      this.packageIdLink
     ].every(link => !link.error);
   }
 
+  onPackageSelected = () => {
+    const { t } = this.props;
+    switch (this.state.packageType) {
+      // case Edge manifest
+      case t(`deployments.typeOptions.${packageTypeOptions[0]}`):
+        const { packages, fetchPackages } = this.props;
+        fetchPackages();
+        this.setState({
+          packageOptions: packageOptions(packages)
+        });
+        break;
+      // other cases to be impletmented in Edge walk iteration
+      default:
+        break;
+    }
+  }
+
   render() {
-    const { t, onClose, isPending, error } = this.props;
-    const { deploymentFile, changesApplied } = this.state;
+    const { t, onClose, isPending, createError } = this.props;
+    const { type, changesApplied, packageOptions } = this.state;
 
     const summaryCount = 1;
     const typeOptions = packageTypeOptions.map(value => ({
@@ -68,12 +95,17 @@ export class DeploymentNew extends LinkedComponent {
       value
     }));
 
-    const completedSuccessfully = changesApplied && !error && !isPending;
+    const completedSuccessfully = changesApplied && !createError && !isPending;
     // Validators
     const requiredValidator = (new Validator()).check(Validator.notEmpty, t('deployments.flyouts.new.validation.required'));
 
     // Links
     this.packageTypeLink = this.linkTo('type').map(({ value }) => value).withValidator(requiredValidator);
+    this.nameLink = this.linkTo('name').map(({ value }) => value).withValidator(requiredValidator);
+    this.deviceGroupIdTypeLink = this.linkTo('deviceGroupId').map(({ value }) => value).withValidator(requiredValidator);
+    this.priorityLink = this.linkTo('priority').map(({ value }) => value).withValidator(requiredValidator);
+    this.packageIdLink = this.linkTo('packageId').map(({ value }) => value).withValidator(requiredValidator);
+    const isPackageTypeSelected = type === undefined;
 
     return (
       <Flyout>
@@ -89,8 +121,9 @@ export class DeploymentNew extends LinkedComponent {
                 type="select"
                 className="long"
                 link={this.packageTypeLink}
+                onChange={this.onPackageSelected}
                 options={typeOptions}
-                placeholder={t('deployments.flyouts.new.placeHolder')}
+                placeholder={t('deployments.flyouts.new.typePlaceHolder')}
                 clearable={false}
                 searchable={false} />
             </FormGroup>
@@ -98,10 +131,11 @@ export class DeploymentNew extends LinkedComponent {
               <FormLabel isRequired="true">{t('deployments.flyouts.new.deviceGroup')}</FormLabel>
               <FormControl
                 type="select"
+                disabled={isPackageTypeSelected}
                 className="long"
-                link={this.packageTypeLink}
+                link={this.deviceGroupIdTypeLink}
                 options={typeOptions}
-                placeholder={t('deployments.flyouts.new.placeHolder')}
+                placeholder={t('deployments.flyouts.new.deviceGroupPlaceHolder')}
                 clearable={false}
                 searchable={false} />
             </FormGroup>
@@ -110,9 +144,9 @@ export class DeploymentNew extends LinkedComponent {
               <FormControl
                 type="text"
                 className="long"
-                link={this.packageTypeLink}
+                link={this.nameLink}
                 options={typeOptions}
-                placeholder={t('deployments.flyouts.new.placeHolder')}
+                placeholder={t('deployments.flyouts.new.namePlaceHolder')}
                 clearable={false}
                 searchable={false} />
             </FormGroup>
@@ -121,31 +155,31 @@ export class DeploymentNew extends LinkedComponent {
               <FormControl
                 type="text"
                 className="long"
-                link={this.packageTypeLink}
+                link={this.priorityLink}
                 options={typeOptions}
-                placeholder={t('deployments.flyouts.new.placeHolder')}
+                placeholder={t('deployments.flyouts.new.priorityPlaceHolder')}
                 clearable={false}
                 searchable={false} />
             </FormGroup>
             <FormGroup>
-              <FormLabel isRequired="true">{t('deployments.flyouts.new.Package')}</FormLabel>
+              <FormLabel isRequired="true">{t('deployments.flyouts.new.package')}</FormLabel>
               <FormControl
                 type="select"
                 className="long"
-                link={this.packageTypeLink}
-                options={typeOptions}
-                placeholder={t('deployments.flyouts.new.placeHolder')}
+                disabled={isPackageTypeSelected}
+                link={this.packageIdLink}
+                options={packageOptions}
+                placeholder={t('deployments.flyouts.new.packagePlaceHolder')}
                 clearable={false}
                 searchable={false} />
             </FormGroup>
             <SummarySection className="new-deployment-summary">
               <SummaryBody>
-                {deploymentFile && <SummaryCount>{summaryCount}</SummaryCount>}
-                {deploymentFile && <SectionDesc>{t('deployments.flyouts.new.deployment')}</SectionDesc>}
+                {<SummaryCount>{summaryCount}</SummaryCount>}
+                {<SectionDesc>{t('deployments.flyouts.new.deployment')}</SectionDesc>}
                 {isPending && <Indicator />}
                 {completedSuccessfully && <Svg className="summary-icon" path={svgs.apply} />}
               </SummaryBody>
-              {deploymentFile && <div className="new-deployment-file-name">{deploymentFile.name}</div>}
               {
                 completedSuccessfully &&
                 <div className="new-deployment-deployment-text">
@@ -153,22 +187,23 @@ export class DeploymentNew extends LinkedComponent {
                 </div>
               }
               {/** Displays an error message if one occurs while applying changes. */
-                error && <AjaxError className="new-deployment-flyout-error" t={t} error={error} />
+                createError && <AjaxError className="new-deployment-flyout-error" t={t} error={createError} />
               }
               {
                 /** If deployment is selected, show the buttons for uploading and closing the flyout. */
-                (deploymentFile && !completedSuccessfully) &&
+                (!completedSuccessfully) &&
                 <BtnToolbar>
                   <Btn svg={svgs.upload} primary={true} disabled={isPending || !this.formIsValid()} type="submit">{t('deployments.flyouts.new.upload')}</Btn>
                   <Btn svg={svgs.cancelX} onClick={onClose}>{t('deployments.flyouts.new.cancel')}</Btn>
                 </BtnToolbar>
               }
               {
-                /** If deployment is not selected, show only the cancel button. */
-                (!deploymentFile) &&
+                /** If deployment is not selected, show only the cancel button.
+
                 <BtnToolbar>
                   <Btn svg={svgs.cancelX} onClick={onClose}>{t('deployments.flyouts.new.cancel')}</Btn>
                 </BtnToolbar>
+                */
               }
               {
                 /** After successful upload, show close button. */

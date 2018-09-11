@@ -5,14 +5,7 @@
 @import 'src/styles/themes';
 
 .new-deployment-content {
-  .new-deployment-upload-container {
-    display: flex;
-    align-items: flex-start;
-    word-wrap: break-word;
-    flex-grow: 0;
-    @include rem-fallback(padding-top, 24px);
-    @include rem-fallback(padding-bottom, 24px);
-  }
+  @include rem-fallback(padding-top, 24px);
 
   .new-deployment-browse-click {
     cursor: pointer;

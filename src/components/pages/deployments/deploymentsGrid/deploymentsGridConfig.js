@@ -47,11 +47,6 @@ export const deploymentsColumnDefs = {
     field: 'succeededCount',
     valueFormatter: ({ value }) => checkForEmpty(value)
   },
-  targeted: {
-    headerName: 'deployments.grid.targeted',
-    field: 'targetedCount',
-    valueFormatter: ({ value }) => checkForEmpty(value)
-  },
   dateCreated: {
     headerName: 'deployments.grid.dateCreated',
     field: 'createdDateTimeUtc',
